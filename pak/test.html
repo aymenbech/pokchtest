@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Dashboard</title>
+    <style>
+        #pokemon-details {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pokemon Search</h1>
+    <input type="text" id="pokemonId" placeholder="Enter Pokemon ID">
+    <button id="searchButton">Search</button>
+    
+    <div id="pokemon-details">
+        <h2>Details</h2>
+        <div id="details"></div>
+    </div>
+
+    <script>
+        // دالة البحث عن البوكيمون
+        const fetchPokemon = async (id) => {
+            const apiUrl = `http://localhost:5000/api/pokemon?id=${id}`; // رابط الخادم
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error("Pokemon not found");
+                }
+                const data = await response.json();
+                displayPokemon(data); // عرض البيانات
+            } catch (error) {
+                console.error(error.message);
+                document.getElementById("details").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        };
+
+        // دالة عرض البيانات في لوحة التحكم
+        const displayPokemon = (pokemon) => {
+            const detailsContainer = document.getElementById("details");
+            detailsContainer.innerHTML = `
+                <p><strong>Name:</strong> ${pokemon.name}</p>
+                <p><strong>Type:</strong> ${pokemon.type.join(", ")}</p>
+                <p><strong>Abilities:</strong> ${pokemon.abilities.join(", ")}</p>
+                <p><strong>Base Experience:</strong> ${pokemon.base_experience}</p>
+                <p><strong>Height:</strong> ${pokemon.height}</p>
+                <p><strong>Weight:</strong> ${pokemon.weight}</p>
+                <img src="${pokemon.sprite_url_front}" alt="${pokemon.name} front">
+                <img src="${pokemon.sprite_url_back}" alt="${pokemon.name} back">
+            `;
+        };
+
+        // زر البحث
+        document.getElementById("searchButton").addEventListener("click", () => {
+            const id = document.getElementById("pokemonId").value.trim();
+            if (id) {
+                fetchPokemon(id);
+            } else {
+                alert("Please enter a valid Pokemon ID");
+            }
+        });
+    </script>
+</body>
+</html>
